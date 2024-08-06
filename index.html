@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Display JSON Data in Table</title>
+    <title>Fetch and Display Account Data</title>
     <style>
         table {
             width: 100%;
@@ -22,15 +22,13 @@
     </style>
 </head>
 <body>
-    <button id="fetchButton">Fetch Data</button>
+    <button id="fetchButton">Fetch Accounts</button>
     <table id="dataTable">
         <thead>
             <tr>
+                <th>Id</th>
                 <th>Name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Date of Joining</th>
-
+                <th>Additional Details</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -40,14 +38,12 @@
 
     <script>
         document.getElementById('fetchButton').addEventListener('click', () => {
-            // URL for the GET request
-            const url = 'https://msa-consultancy-dev-ed.develop.my.salesforce.com/services/data/v60.0/sobjects/Account';
-
-            // Access token for authorization
+            // Base URL for the GET requests
+            const baseUrl = 'https://msa-consultancy-dev-ed.develop.my.salesforce.com/services/data/v60.0/sobjects/Account';
             const accessToken = '00D5j00000CABAq!ARsAQFV3DC1kjK6rPCq4Y7VXjPTvfHtxvQ.BjbbtOLBp38Ox5YKYaY.hjQS8v8Sfiu1TOku0MAZtFuRhh8mTezS0utYoULhh';
 
-            // Perform the GET request using fetch
-            fetch(url, {
+            // Fetch the list of Account records
+            fetch(baseUrl, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -61,24 +57,40 @@
                 return response.json();
             })
             .then(data => {
-                // Populate the table with the fetched data
                 const tableBody = document.getElementById('tableBody');
                 tableBody.innerHTML = ''; // Clear previous data
 
-                data.recentItems.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${item.Name}</td>
-                        <td>${item.Phone}</td>
-                       <td>${item.Email}</td>
-                        <td>${item.Date}</td>
-
-                    `;
-                    tableBody.appendChild(row);
+                // Loop through the list of recent items and fetch details for each account
+                const fetchPromises = data.recentItems.map(item => {
+                    return fetch(`${baseUrl}/${item.Id}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(details => {
+                        // Create a row for each account with detailed info
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${details.Id}</td>
+                            <td>${details.Name}</td>
+                            <td>${JSON.stringify(details, null, 2)}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
                 });
+
+                // Wait for all fetches to complete
+                return Promise.all(fetchPromises);
             })
             .catch(error => {
-                // Handle any errors
                 console.error('Error:', error);
             });
         });
