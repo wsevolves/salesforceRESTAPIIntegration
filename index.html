@@ -26,9 +26,10 @@
     <table id="dataTable">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
-                <th>Additional Details</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Date of Joining</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -79,9 +80,10 @@
                         // Create a row for each account with detailed info
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${details.Id}</td>
-                            <td>${details.Name}</td>
-                            <td>${JSON.stringify(details, null, 2)}</td>
+                            <td>${details.Name || 'N/A'}</td>
+                            <td>${details.Phone || 'N/A'}</td>
+                            <td>${details.Email || 'N/A'}</td>
+                            <td>${details.Date_of_Joining__c || 'N/A'}</td>
                         `;
                         tableBody.appendChild(row);
                     });
