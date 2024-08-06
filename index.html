@@ -26,9 +26,11 @@
     <table id="dataTable">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
-                <th>URL</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Date of Joining</th>
+
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -66,9 +68,11 @@
                 data.recentItems.forEach(item => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${item.Id}</td>
                         <td>${item.Name}</td>
-                        <td>${item.attributes.url}</td>
+                        <td>${item.Phone}</td>
+                       <td>${item.Email}</td>
+                        <td>${item.Date}</td>
+
                     `;
                     tableBody.appendChild(row);
                 });
