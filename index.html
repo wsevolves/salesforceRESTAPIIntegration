@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Salesforce Accounts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #accounts {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        #accounts th, #accounts td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        #accounts th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Account List View</h1>
+    <table id="accounts">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Industry</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <tbody id="account-list">
+            <!-- Account rows will be inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+        // Fetch account data from Salesforce
+        async function fetchAccounts() {
+            try {
+                const response = await fetch('https://msa-consultancy-dev-ed.develop.my.salesforce.com/services/data/v61.0/sobjects/Account', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer 00D5j00000CABAq!ARsAQFV3DC1kjK6rPCq4Y7VXjPTvfHtxvQ.BjbbtOLBp38Ox5YKYaY.hjQS8v8Sfiu1TOku0MAZtFuRhh8mTezS0utYoULhh',
+                        'Cookie': 'BrowserId=iXWAr1PAEe-shVXHShD9kw; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    // Uncomment the line below to display data
+                    // displayAccounts(data.records);
+                } else {
+                    console.error('Failed to fetch accounts:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error fetching accounts:', error);
+            }
+        }
+
+        // Function to display account data in the table (if necessary)
+        function displayAccounts(accounts) {
+            const accountList = document.getElementById('account-list');
+            accounts.forEach(account => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${account.Name}</td>
+                    <td>${account.Industry}</td>
+                    <td>${account.Phone}</td>
+                `;
+                accountList.appendChild(row);
+            });
+        }
+
+        // Fetch accounts when the page loads
+        document.addEventListener('DOMContentLoaded', fetchAccounts);
+    </script>
+</body>
+</html>
