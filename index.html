@@ -3,26 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Data</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Fetch Data</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Account Data</h1>
-        <div class="object-describe">
-            <h2>Object Describe</h2>
-            <p><strong>Label:</strong> <span id="label"></span></p>
-            <p><strong>Name:</strong> <span id="name"></span></p>
-            <p><strong>Queryable:</strong> <span id="queryable"></span></p>
-            <!-- Add more fields as needed -->
-        </div>
-        <div class="recent-items">
-            <h2>Recent Items</h2>
-            <ul id="recent-items-list">
-                <!-- Recent items will be populated here -->
-            </ul>
-        </div>
-    </div>
-    <script src="script.js"></script>
+    <button id="fetchButton">Fetch Data</button>
+    <pre id="response"></pre>
+
+    <script>
+        document.getElementById('fetchButton').addEventListener('click', () => {
+            // URL for the GET request
+            const url = 'https://msa-consultancy-dev-ed.develop.my.salesforce.com/services/data/v60.0/sobjects/Account';
+
+            // Access token for authorization
+            const accessToken = '00D5j00000CABAq!ARsAQFV3DC1kjK6rPCq4Y7VXjPTvfHtxvQ.BjbbtOLBp38Ox5YKYaY.hjQS8v8Sfiu1TOku0MAZtFuRhh8mTezS0utYoULhh';
+
+            // Perform the GET request using fetch
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display the data in the response div
+                document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                // Display any errors
+                document.getElementById('response').textContent = 'Error: ' + error.message;
+            });
+        });
+    </script>
 </body>
 </html>
