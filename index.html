@@ -3,11 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fetch Data</title>
+    <title>Display JSON Data in Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
     <button id="fetchButton">Fetch Data</button>
-    <pre id="response"></pre>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>URL</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Data rows will be inserted here -->
+        </tbody>
+    </table>
 
     <script>
         document.getElementById('fetchButton').addEventListener('click', () => {
@@ -32,12 +59,23 @@
                 return response.json();
             })
             .then(data => {
-                // Display the data in the response div
-                document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+                // Populate the table with the fetched data
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = ''; // Clear previous data
+
+                data.recentItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.Id}</td>
+                        <td>${item.Name}</td>
+                        <td>${item.attributes.url}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
             })
             .catch(error => {
-                // Display any errors
-                document.getElementById('response').textContent = 'Error: ' + error.message;
+                // Handle any errors
+                console.error('Error:', error);
             });
         });
     </script>
