@@ -40,7 +40,7 @@
     <script>
         document.getElementById('fetchButton').addEventListener('click', () => {
             // Base URL for the GET requests
-            const baseUrl = 'https://msa-consultancy-dev-ed.develop.my.salesforce.com/services/data/v60.0/sobjects/Account/listviews/__Recent/results';
+            const baseUrl = 'https://msa-consultancy-dev-ed.develop.my.salesforce.com/services/data/v60.0/sobjects/Account/';
             const accessToken = '00D5j00000CABAq!ARsAQFV3DC1kjK6rPCq4Y7VXjPTvfHtxvQ.BjbbtOLBp38Ox5YKYaY.hjQS8v8Sfiu1TOku0MAZtFuRhh8mTezS0utYoULhh';
 
             // Fetch the list of Account records
@@ -83,7 +83,7 @@
                         row.innerHTML = `
                             <td>${details.Name || 'N/A'}</td>
                             <td>${details.Phone || 'N/A'}</td>
-                            <td>${details.Email || 'N/A'}</td>
+                            <td>${details.Email__c || 'N/A'}</td>
                             <td>${details.Date_of_Joining__c || 'N/A'}</td>
                         `;
                         tableBody.appendChild(row);
