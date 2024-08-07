@@ -39,51 +39,21 @@
 
     <script>
         document.getElementById('fetchButton').addEventListener('click', () => {
-            // First, obtain the access token
-            const tokenUrl = 'https://login.salesforce.com/services/oauth2/token';
-            const clientId = '3MVG9pRzvMkjMb6l5OAsd10z6fCamhpR0I.6Qenm9.EBj8T_IelBt356CIofaPkU8bVRXy9CpeLOo.hoJ9WR6';
-            const clientSecret = '9F9D5D82614FE232E623C4C5476D47B9405E947C4419686F04DA031E38F49909';
-            const username = 'subhankar@mishra.com';
-            const password = 'Salesforce@18';
+            // Base URL for the GET requests
+            const baseUrl = 'https://msa-consultancy-dev-ed.develop.my.salesforce.com/services/data/v60.0/sobjects/Account';
+            const accessToken = '00D5j00000CABAq!ARsAQDzuq619mWWdaymKw0ukv15MImi.0swhUptudcLG8aWtNMDdKvKlAZE470HZCoTVl6LpJCikNXsFRWK0XE2wjVMpH07P';
 
-            const tokenParams = new URLSearchParams();
-            tokenParams.append('grant_type', 'password');
-            tokenParams.append('client_id', clientId);
-            tokenParams.append('client_secret', clientSecret);
-            tokenParams.append('username', username);
-            tokenParams.append('password', password);
-
-            fetch(tokenUrl, {
-                method: 'POST',
+            // Fetch the list of Account records
+            fetch(baseUrl, {
+                method: 'GET',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-PrettyPrint': '1'
-                },
-                body: tokenParams
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to obtain access token ' + response.statusText);
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
                 }
-                return response.json();
-            })
-            .then(tokenData => {
-                const accessToken = tokenData.access_token;
-                const instanceUrl = tokenData.instance_url;
-                const baseUrl = `${instanceUrl}/services/data/v60.0/sobjects/Account`;
-
-                // Fetch the list of Account records
-                return fetch(baseUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Failed to fetch accounts ' + response.statusText);
+                    throw new Error('Network response was not ok ' + response.statusText);
                 }
                 return response.json();
             })
@@ -93,7 +63,7 @@
 
                 // Loop through the list of recent items and fetch details for each account
                 const fetchPromises = data.recentItems.map(item => {
-                    return fetch(`${item.attributes.url}`, {
+                    return fetch(`${baseUrl}/${item.Id}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${accessToken}`,
@@ -102,7 +72,7 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Failed to fetch account details ' + response.statusText);
+                            throw new Error('Network response was not ok ' + response.statusText);
                         }
                         return response.json();
                     })
@@ -112,7 +82,7 @@
                         row.innerHTML = `
                             <td>${details.Name || 'N/A'}</td>
                             <td>${details.Phone || 'N/A'}</td>
-                            <td>${details.Email || 'N/A'}</td>
+                            <td>${details.Email__c || 'N/A'}</td>
                             <td>${details.Date_of_Joining__c || 'N/A'}</td>
                         `;
                         tableBody.appendChild(row);
