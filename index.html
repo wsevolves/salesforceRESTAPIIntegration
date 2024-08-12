@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -40,62 +40,177 @@
     <script>
         document.getElementById('fetchButton').addEventListener('click', () => {
             // Base URL for the GET requests
-            const baseUrl = 'https://msa-consultancy-dev-ed.develop.my.salesforce.com/services/data/v60.0/sobjects/Account';
-            const accessToken = '00D5j00000CABAq!ARsAQAIuwxD_T6xjX8xDDvrGynsWFdiMf4POmo2OUB39PWg3Huc4hADG6xjKqOhjwAfkCOfpz9k225LvFLTrWweYDAdNqfyG';
+        //     const baseUrl = 'https://msa-consultancy-dev-ed.develop.my.salesforce.com/services/data/v60.0/sobjects/Account';
+        //     const accessToken = '00D5j00000CABAq!ARsAQAIuwxD_T6xjX8xDDvrGynsWFdiMf4POmo2OUB39PWg3Huc4hADG6xjKqOhjwAfkCOfpz9k225LvFLTrWweYDAdNqfyG';
 
-            // Fetch the list of Account records
-            fetch(baseUrl, {
-                method: 'GET',
+        //     // Fetch the list of Account records
+        //     fetch(baseUrl, {
+        //         method: 'GET',
+        //         headers: {
+        //             'Authorization': `Bearer ${accessToken}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('Network response was not ok ' + response.statusText);
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         const tableBody = document.getElementById('tableBody');
+        //         tableBody.innerHTML = ''; // Clear previous data
+
+        //         // Loop through the list of recent items and fetch details for each account
+        //         const fetchPromises = data.recentItems.map(item => {
+        //             return fetch(`${baseUrl}/${item.Id}`, {
+        //                 method: 'GET',
+        //                 headers: {
+        //                     'Authorization': `Bearer ${accessToken}`,
+        //                     'Content-Type': 'application/json'
+        //                 }
+        //             })
+        //             .then(response => {
+        //                 if (!response.ok) {
+        //                     throw new Error('Network response was not ok ' + response.statusText);
+        //                 }
+        //                 return response.json();
+        //             })
+        //             .then(details => {
+        //                 const row = document.createElement('tr');
+        //                 row.innerHTML = `
+        //                     <td>${details.Name || 'N/A'}</td>
+        //                     <td>${details.Phone || 'N/A'}</td>
+        //                     <td>${details.Email__c || 'N/A'}</td>
+        //                     <td>${details.Date_of_Joining__c || 'N/A'}</td>
+        //                 `;
+        //                 tableBody.appendChild(row);
+        //             });
+        //         });
+        //         return Promise.all(fetchPromises);
+        //     })
+        //     .catch(error => {
+        //         console.error('Error:', error);
+        //     });
+        // });
+    </script>
+</body>
+</html>
+ -->
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce OAuth2 Token Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Salesforce OAuth2 Token Request</h2>
+        <div class="form-group">
+            <label for="client_id">Client ID</label>
+            <input type="text" id="client_id" placeholder="Enter Client ID">
+        </div>
+        <div class="form-group">
+            <label for="client_secret">Client Secret</label>
+            <input type="password" id="client_secret" placeholder="Enter Client Secret">
+        </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter Salesforce Username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter Salesforce Password + Security Token">
+        </div>
+        <button onclick="requestToken()">Request Token</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function requestToken() {
+            const client_id = document.getElementById('client_id').value;
+            const client_secret = document.getElementById('client_secret').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const body = new URLSearchParams({
+                'grant_type': 'password',
+                'client_id': client_id,
+                'client_secret': client_secret,
+                'username': username,
+                'password': password
+            });
+
+            fetch('https://login.salesforce.com/services/oauth2/token', {
+                method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-PrettyPrint': '1'
+                },
+                body: body.toString()
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                const tableBody = document.getElementById('tableBody');
-                tableBody.innerHTML = ''; // Clear previous data
-
-                // Loop through the list of recent items and fetch details for each account
-                const fetchPromises = data.recentItems.map(item => {
-                    return fetch(`${baseUrl}/${item.Id}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok ' + response.statusText);
-                        }
-                        return response.json();
-                    })
-                    .then(details => {
-                        // Create a row for each account with detailed info
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${details.Name || 'N/A'}</td>
-                            <td>${details.Phone || 'N/A'}</td>
-                            <td>${details.Email__c || 'N/A'}</td>
-                            <td>${details.Date_of_Joining__c || 'N/A'}</td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                });
-
-                // Wait for all fetches to complete
-                return Promise.all(fetchPromises);
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
             })
             .catch(error => {
-                console.error('Error:', error);
+                document.getElementById('result').textContent = 'Error: ' + error;
             });
-        });
+        }
     </script>
 </body>
 </html>
